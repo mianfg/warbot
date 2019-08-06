@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*- 
+# -*- coding: utf-8 -*-
 
 """
 WarBotAdmin
@@ -72,26 +72,26 @@ class WarBotAdmin(TelegramInterface):
         Handles command /stopfrequency
     handle_forcebattle(chat, attr)
         Handles command /forcebattle
-    handle_getusers(chat)
-        Handles command /getusers
-    handle_getuser(chat, attr)
-        Handles command /getuser
+    handle_getfighters(chat)
+        Handles command /getfighters
+    handle_getfighter(chat, attr)
+        Handles command /getfighter
     handle_getcandidates(chat)
         Handles command /getcandidates
-    handle_adduser(chat, attr)
-        Handles command /adduser
-    handle_deleteuser(chat, attr)
-        Handles command /deleteuser
+    handle_addfighter(chat, attr)
+        Handles command /addfighter
+    handle_deletefighter(chat, attr)
+        Handles command /deletefighter
     handle_addcandidate(chat, attr)
         Handles command /addcandidate
     handle_deletecandidate(chat, attr)
         Handles command /deletecandidate
     handle_revive(chat, attr)
         Handles command /revive
-    handle_announceusers(chat)
-        Handles command /announceusers
-    handle_stopannounceusers(chat)
-        Handles command /stopannounceusers
+    handle_announcefighters(chat)
+        Handles command /announcefighters
+    handle_stopannouncefighters(chat)
+        Handles command /stopannouncefighters
     handle_status(chat)
         Handles command /status
     handle_restart(chat, attr)
@@ -101,7 +101,8 @@ class WarBotAdmin(TelegramInterface):
 
 
     def __init__(self, telegram_token, telegram_sleep_time, \
-        database_route, database_filename, auth_id):
+        database_route, database_filename, \
+        phrases_route, phrases_filename, auth_id):
         """
         Parameters
         ----------
@@ -112,12 +113,17 @@ class WarBotAdmin(TelegramInterface):
         database_filename : str
             Filename of JSON database for WarBotDB.
                 To avoid bugs, must be absolute path
+        phrases_route : str
+            Folder route to phrases file
+        phrases_filename : str
+            Filename of txt file containing battle phrases
         auth_id : int
             Telegram ID of authorized user
         """
 
         super(WarBotAdmin, self).__init__(telegram_token, telegram_sleep_time)
-        self.bot = WarBot(database_route, database_filename)
+        self.bot = WarBot(database_route, database_filename, \
+            phrases_route, phrases_filename)
         self.ask_status = "NONE"
         self.auth_id = auth_id
 
@@ -175,39 +181,39 @@ class WarBotAdmin(TelegramInterface):
                         self.handle_stopfrequency(chat)
                     elif text.startswith('/forcebattle'):
                         self.handle_forcebattle(chat, text.split()[1:])
-                    elif text.startswith('/getusers'):
-                        self.handle_getusers(chat)
-                    elif text.startswith('/getuser'):
-                        self.handle_getuser(chat, text.split()[1:])
+                    elif text.startswith('/getfighters'):
+                        self.handle_getfighters(chat)
+                    elif text.startswith('/getfighter'):
+                        self.handle_getfighter(chat, text.split()[1:])
                     elif text.startswith('/getcandidates'):
                         self.handle_getcandidates(chat)
-                    elif text.startswith('/adduser'):
-                        self.handle_adduser(chat, text.split()[1:])
-                    elif text.startswith('/deleteuser'):
-                        self.handle_deleteuser(chat, text.split()[1:])
+                    elif text.startswith('/addfighter'):
+                        self.handle_addfighter(chat, text.split()[1:])
+                    elif text.startswith('/deletefighter'):
+                        self.handle_deletefighter(chat, text.split()[1:])
                     elif text.startswith('/addcandidate'):
                         self.handle_addcandidate(chat, text.split()[1:])
                     elif text.startswith('/deletecandidate'):
                         self.handle_deletecandidate(chat, text.split()[1:])
                     elif text.startswith('/revive'):
                         self.handle_revive(chat, text.split()[1:])
-                    elif text.startswith('/announceusers'):
-                        self.handle_announceusers(chat)
-                    elif text.startswith('/stopannounceusers'):
-                        self.handle_stopannounceusers(chat)
+                    elif text.startswith('/announcefighters'):
+                        self.handle_announcefighters(chat)
+                    elif text.startswith('/stopannouncefighters'):
+                        self.handle_stopannouncefighters(chat)
                     elif text.startswith('/status'):
                         self.handle_status(chat)
                     elif text.startswith('/restart'):
                         self.handle_restart(chat, text.split()[1:])
                     else:
-                        self.send_message("Ninguna opción disponible. " \
-                            + "Usa /help para ver todos los comandos.", chat)
-                elif self.ask_status == "BUTTONS_GETUSER":
-                    self.handle_getuser(chat, [text])
-                elif self.ask_status == "BUTTONS_ADDUSER":
-                    self.handle_adduser(chat, [text])
-                elif self.ask_status == "BUTTONS_DELETEUSER":
-                    self.handle_deleteuser(chat, [text])
+                        self.send_message("No option available. " \
+                            + "Use /help to see all the commands.", chat)
+                elif self.ask_status == "BUTTONS_GETFIGHTER":
+                    self.handle_getfighter(chat, [text])
+                elif self.ask_status == "BUTTONS_ADDFIGHTER":
+                    self.handle_addfighter(chat, [text])
+                elif self.ask_status == "BUTTONS_DELETEFIGHTER":
+                    self.handle_deletefighter(chat, [text])
                 elif self.ask_status == "BUTTONS_DELETECANDIDATE":
                     self.handle_deletecandidate(chat, [text])
                 elif self.ask_status == "BUTTONS_REVIVE":
@@ -234,45 +240,45 @@ class WarBotAdmin(TelegramInterface):
         """
 
         text = "*Bloomgogo War Bot* v1.0\n" \
-            + "Diseñado por: Miguel Ángel Fernández Gutiérrez (@mianfg)\n\n" \
-            + "*Comandos 👩‍💻👨‍💻*\n" \
-            + "\n🔁 Sincronización:\n" \
-            + "/runoptin · Permite a los usuarios de Twitter añadirse a la " \
-            + "lista de candidatos 📬 mencionando a la cuenta\n" \
-            + "/stopoptin · Paraliza la funcionalidad anterior 📭\n" \
+            + "Created by: Miguel Ángel Fernández Gutiérrez (@mianfg)\n\n" \
+            + "*Commands 👩‍💻👨‍💻*\n" \
+            + "\n🔁 Sync:\n" \
+            + "/runoptin · Allows Twitter users to add themselves to the "\
+            + "candidates list 📬 mentioning the account\n" \
+            + "/stopoptin · Stops previous functionality 📭\n" \
             + "\n⚔️ Batallas:\n" \
-            + "/nextbattle · Información de cuándo tendrá lugar la próxima " \
-            + "batalla ⏰\n" \
+            + "/nextbattle · Information about when the next battle will " \
+            + "happen ⏰\n" \
             + "/schedulebattle `[dd/mm/aaaa hh:mm | hh:mm | stop]` · " \
-            + "Configura cuándo tendrá lugar la próxima batalla ➡️⏰\n" \
-            + "— `dd.mm.aaaa hh:mm` · Especificar el día y hora\n" \
-            + "— `hh:mm` · Especificar la hora (si ha pasado se tomará el día siguiente)\n" \
-            + "— `stop` · Parar batallas 🛑⏰\n" \
-            + "/battlefrequency · Devuelve la frecuencia a la que se programarán las batallas ⏳\n" \
-            + "/setbattlefrequency `[hours] [minutes]` · Configura la frecuencia a la que se programarán las batallas ➡️⏳\n" \
-            + "/stopfrequency · Para las batallas automáticas 🛑⏳\n" \
-            + "/forcebattle `(winner) (defeated)` · Forzar una batalla entre dos usuarios ➡️⚔️\n" \
-            + "— `winner` · Usuario que ganará la batalla\n" \
-            + "— `defeated` · Usuario que perderá la batalla\n" \
-            + "— dejar en blanco para efectuar batalla aleatoria\n" \
-            + "**Nota importante:** _al insertar usuarios, no incluir el @_\n" \
-            + "\nℹ️ Información y estado:\n" \
-            + "/getusers · Devuelve una lista completa de usuarios, junto a su estado en el juego 👥\n" \
-            + "/getuser `[username]` · Devuelve información completa sobre un usuario 👥\n" \
-            + "/getcandidates · Devuelve una lista completa de candidatos 🕵️\n" \
-            + "\n➡️👥 Modificación de usuarios:\n" \
-            + "/adduser `[username] (announce)` · Añade un usuario\n" \
-            + "— `announce` · Añadir el string `announce` para publicar un tweet anunciando que el usuario ha sido añadido al juego 🔔\n" \
-            + "/deleteuser `[username]` · Elimina un usuario (¡usar con precaución!)\n" \
-            + "/addcandidate `[username]` · Añade un candidato\n" \
-            + "/deletecandidate `[username]` · Elimina un candidato (¡usar con precaución!)\n" \
-            + "/revive `[username]` · Revive un usuario 🧟\n" \
-            + "\nInteractividad:\n" \
-            + "/announceusers · Anunciar usuarios añadidos automáticamente 🔔\n" \
-            + "/stopannounceusers · Sólo se anunciarán usuarios con atributo de anunciado 🛑🔔\n" \
+            + "Configures when next battle will happen ➡️⏰\n" \
+            + "— `dd.mm.aaaa hh:mm` · Specify day and hour\n" \
+            + "— `hh:mm` · Specify hour (if passed, tomorrow will be assigned)\n" \
+            + "— `stop` · Stop battles 🛑⏰\n" \
+            + "/battlefrequency · Returns frequency in which battles will be programmed ⏳\n" \
+            + "/setbattlefrequency `[hours] [minutes]` · Configures frequency in which battles will be programmed ➡️⏳\n" \
+            + "/stopfrequency · Stop automatic battles 🛑⏳\n" \
+            + "/forcebattle `(winner) (defeated)` · Force a battle ➡️⚔️\n" \
+            + "— `winner` · Fighter that will win the battle\n" \
+            + "— `defeated` · Fighter that will lose the battle\n" \
+            + "— leave blank to inquire a random battle\n" \
+            + "**Important notice:** _when adding usernames, do not include @_\n" \
+            + "\nℹ️ Information and status:\n" \
+            + "/getfighters · Returns a complete list of fighters, including their state in the game 👥\n" \
+            + "/getfighter `[username]` · Return all information about a fighter 👥\n" \
+            + "/getcandidates · Return complete list of candidates 🕵️\n" \
+            + "\n➡️👥 Alter users:\n" \
+            + "/addfighter `[username](!)` · Add a fighter\n" \
+            + "— `!` · Add the sign `!` to publish a tweet announcing that the user has been added to the game as fighter 🔔\n" \
+            + "/deletefighter `[username]` · Delete a fighter (use with caution!)\n" \
+            + "/addcandidate `[username]` · Add a candidate\n" \
+            + "/deletecandidate `[username]` · Delete a candidate (use with caution!)\n" \
+            + "/revive `[username]` · Revive a fighter 🧟\n" \
+            + "\nInteractivity:\n" \
+            + "/announcefighters · Automatically announce added fighters 🔔\n" \
+            + "/stopannouncefighters · New fighters will be announced only if specified when adding 🛑🔔\n" \
             + "\n📈 Estado:\n" \
-            + "/status · Recibir el estado del bot\n" \
-            + "/restart `confirm` · Reiniciar base de datos"
+            + "/status · Retrieve bot status\n" \
+            + "/restart `confirm` · Restart database"
         self.send_message(text, chat)
         log.send_message("[TELEGRAM] sent WarBotAdmin.handle_help")
     
@@ -284,8 +290,8 @@ class WarBotAdmin(TelegramInterface):
         bot
         """
 
-        text = "¡Buenas! Este bot ha sido diseñado para ser manipulado por un conjunto " \
-            + "seleccionado de usuarios. Hable con el administrador de este bot para más información."
+        text = "Hi! This bot has been designed to be manipulated by a restrained " \
+            + "set of users. Talk with this bot's administrator for more info."
         self.send_message(text, chat)
         log.send_message("[TELEGRAM] sent WarBotAdmin.handle_unauthorized")
     
@@ -305,7 +311,7 @@ class WarBotAdmin(TelegramInterface):
         Where * is any string
         """
 
-        text = '¡Bienvenido a *Bloomgogo War Bot*! Use el comando /help para más información'
+        text = 'Welcome to *Bloomgogo War Bot*! Use /help for more information'
         self.send_message(text, chat)
         log.send_message("[TELEGRAM] sent WarBotAdmin.handle_start")
 
@@ -326,10 +332,10 @@ class WarBotAdmin(TelegramInterface):
         """
 
         if self.bot.get_optin_running():
-            text = "El opt-in ya estaba ejecutándose."
+            text = "Opt-in was already in execution."
         else:
             self.bot.set_optin_running(True)
-            text = "El opt-in ha sido activado."
+            text = "Opt-in successfully activated."
         self.send_message(text, chat)
         log.send_message("[TELEGRAM] sent WarBotAdmin.handle_runoptin")
 
@@ -350,10 +356,10 @@ class WarBotAdmin(TelegramInterface):
         """
 
         if not self.bot.get_optin_running():
-            text = "El opt-in se encontraba parado."
+            text = "Opt-in was already stopped."
         else:
             self.bot.set_optin_running(False)
-            text = "El opt-in ha sido desactivado."
+            text = "Opt-in successfully deactivated."
         self.send_message(text, chat)
         log.send_message("[TELEGRAM] sent WarBotAdmin.handle_stopoptin")
     
@@ -374,10 +380,10 @@ class WarBotAdmin(TelegramInterface):
         """
 
         if self.bot.get_stop_next_battle():
-            text = "No habrá próxima batalla. Use /schedulebattle para configurarla."
+            text = "There will be no next battle. Use /schedulebattle to configure it."
         else:
             date = self.bot.get_next_battle()
-            text = "La próxima batalla se producirá a las: " \
+            text = "Next battle is scheduled to happen at: " \
                 + "{}/{}/{} {:02d}:{:02d}".format(date.day, date.month, date.year, date.hour, date.minute)
         self.send_message(text, chat)
         log.send_message("[TELEGRAM] sent WarBotAdmin.handle_nextbattle")
@@ -407,21 +413,21 @@ class WarBotAdmin(TelegramInterface):
         result = self.bot.set_next_battle(input)
 
         if input.startswith('stop'):
-            text = "Se ha parado la siguiente batalla. "
+            text = "Next battle has successfully been stopped. "
             self.bot.set_stop_next_battle(True)
         else:
             if result:
-                text = "Modificado correctamente. "
+                text = "Successfully modified. "
                 self.bot.set_stop_next_battle(False)
             else:
-                text = "No modificado, el formato era erróneo. Debe insertar la fecha en el formato dd/mm/aa HH:MM. "
+                text = "Not modified, wrong format. You must insert the date in the format dd/mm/yy HH:MM. "
 
         if not self.bot.get_stop_next_battle():
             date = self.bot.get_next_battle()
-            text += "La próxima batalla se producirá a las: " \
+            text += "Next battle is scheduled to happen at: " \
                 + "{}/{}/{} {:02d}:{:02d}".format(date.day, date.month, date.year, date.hour, date.minute)
         else:
-            text += "No habrá próxima batalla."
+            text += "There will be no next battle."
         
         self.send_message(text, chat)
         log.send_message("[TELEGRAM] sent WarBotAdmin.handle_schedulebattle")
@@ -444,10 +450,10 @@ class WarBotAdmin(TelegramInterface):
         """
 
         if self.bot.get_stop_frequency():
-            text = "La frecuencia de batalla se encuentra pausada."
+            text = "Battle frequency was already stopped."
         else:
             f_h, f_m = self.bot.get_battle_frequency()
-            text = "Frecuencia de batalla: {} horas y {} minutos.".format(f_h, f_m)
+            text = "Battle frequency: {} hours {} minutes.".format(f_h, f_m)
         
         self.send_message(text, chat)
         log.send_message("[TELEGRAM] sent WarBotAdmin.handle_battlefrequency")
@@ -478,13 +484,13 @@ class WarBotAdmin(TelegramInterface):
                 if h >= 0 and m > 0 and m < 60:
                     self.bot.set_battle_frequency(attr[0], attr[1])
                     self.bot.set_stop_frequency(False)
-                    text = "Frecuencia de batalla cambiada a {} horas y {} minutos.".format(h, m)
+                    text = "Battle frequency successfully set to {} hours {} minutes.".format(h, m)
                 else:
-                    text = "Debe insertar unas horas y minutos válidos."
+                    text = "You must insert a valid amount of hours and minutes."
             except ValueError:
-                text = "Debe insertar unas horas y minutos válidos."
+                text = "You must insert a valid amount of hours and minutes."
         else:
-            text = "Número de argumentos incorrecto."
+            text = "Wrong number of arguments."
 
         self.send_message(text, chat)
         log.send_message("[TELEGRAM] sent WarBotAdmin.handle_setbattlefrequency")
@@ -506,10 +512,10 @@ class WarBotAdmin(TelegramInterface):
         """
 
         if self.bot.get_stop_frequency():
-            text = "Las batallas automáticas se encontraban pausadas. Para reanudar, use /setbattlefrequency."
+            text = "Automatic battles were alredy stopped. To resume, use /setbattlefrequency."
         else:
             self.bot.set_stop_frequency(True)
-            text = "Se han pausado las batallas automáticas. Para reanudar, use /setbattlefrequency."
+            text = "Automatic battles have successfully been stopped. To resume, use /setbattlefrequency."
         self.send_message(text, chat)
         log.send_message("[TELEGRAM] sent WarBotAdmin.handle_stopfrequency")
 
@@ -538,105 +544,110 @@ class WarBotAdmin(TelegramInterface):
             defeated = attr[1]
             result = self.bot.force_battle(winner, defeated)
             if result:
-                text = 'Batalla efectuada: *' + winner + '* ha matado a *' + defeated + '*'
+                text = 'Battle executed: *' + winner + '* has killed *' + defeated + '*'
             else:
-                text = "La batalla no pudo efectuarse."
+                text = "Battle could not be executed."
         else:
             winner, defeated = self.bot.battle()
             if winner != None and defeated != None:
-                text = 'Batalla efectuada: *' + winner + '* ha matado a *' + defeated + '*'
+                text = 'Battle executed: *' + winner + '* has killed *' + defeated + '*'
             else:
-                text = 'La batalla no pudo efectuarse.'
+                text = 'Battle could not be executed.'
         self.send_message(text, chat)
         log.send_message("[TELEGRAM] sent WarBotAdmin.handle_forcebattle")
     
 
-    def handle_getusers(self, chat):
-        """Handles command /getusers
+    def handle_getfighters(self, chat):
+        """Handles command /getfighters
 
-        Gives list of users
+        Gives list of fighters
 
         Command call
         ------------
         This function is called whenever the authorized user sends a message
         to the Telegram bot of the form:
 
-            /getusers*
+            /getfighters*
         
         Where * is any string
         """
 
-        text = '👥 *Lista de usuarios:*'
-        i = 1
-        for user in self.bot.get_users_extended():
-            text += "\n" + str(i) + ". " + user["username"]
-            if not user["alive"]:
+        text = '👥 *List of fighters:*'
+        i = 0
+        for fighter in self.bot.get_fighters_extended():
+            text += "\n" + str(i+1) + ". `" + fighter["username"] + "`"
+            if not fighter["alive"]:
                 text += " 💀"
-            if not user["show"]:
+            if not fighter["show"]:
                 text += " 👻"
             i += 1
-        self.send_message(text, chat)
-        log.send_message("[TELEGRAM] sent WarBotAdmin.handle_getusers")
+            if i%5 == 0:
+                self.send_message(text, chat)
+                text = ""
+        if text != "":
+            self.send_message(text, chat)
+        
+        log.send_message("[TELEGRAM] sent WarBotAdmin.handle_getfighters")
 
 
-    def handle_getuser(self, chat, attr):
-        """Handles command /getuser
+    def handle_getfighter(self, chat, attr):
+        """Handles command /getfighter
 
-        Gives all information about a specific user
+        Gives all information about a specific fighter
 
         Command call
         ------------
         This function is called whenever the authorized user sends a message
         to the Telegram bot of the form:
 
-            /getuser*
+            /getfighter*
         
         Where * is any string. The use of this command is:
 
             Option 1.
-                /getuser [username] *
+                /getfighter [username] *
                 Will show info about username (rest of args ignored)
             Option 2.
-                /getuser
-                Will prompt button GUI with all users, selecting one of them
-                or sending a message with the name of a user will do the same
-                effect as Option 1 with the same user
+                /getfighter
+                Will prompt button GUI with all fighters, selecting one of them
+                or sending a message with the name of a fighter will do the same
+                effect as Option 1 with the same fighter
         """
 
         items = []
-        for user in self.bot.get_users_extended():
-            items.append(user["username"])
+        for fighter in self.bot.get_fighters_extended():
+            items.append(fighter["username"])
 
         if len(attr) > 0:            
             if attr[0] in items:
-                text = "👤 Usuario: *" + attr[0] + "*\n" \
-                    + "\nEstado: "
-                user = next(item for item in self.bot.get_users_extended() if item["username"] == attr[0])
-                if user["alive"]:
-                    text += " vivo"
+                text = "👤 Fighter: *" + attr[0] + "*\n" \
+                    + "\Status: "
+                fighter = next(item for item in self.bot.get_fighters_extended() if item["username"] == attr[0])
+                if fighter["alive"]:
+                    text += " alive"
                 else:
-                    text += " muerto 💀"
-                text += "\nHa matado a: "
-                if len(user["killed"]) > 0:
-                    text += ', '.join(user["killed"])
+                    text += " dead 💀"
+                text += "\nHas killed: "
+                if len(fighter["killed"]) > 0:
+                    text += ', '.join("`" + fighter["killed"] + "`")
                 else:
-                    text += "ningún usuario"
-                text += "\nMostrar en lista: "
-                if user['show']:
-                    text += "sí"
+                    text += "no other fighters"
+                text += "\nShow in list: "
+                if fighter['show']:
+                    text += "yes"
                 else:
                     text += "no 👻"
             else:
-                text = "Usuario no encontrado."
+                text = "Fighter not found."
             self.ask_status = "NONE"
             items = []
         else:
-            text = "Inserta el nombre del usuario o usa el desplegable para seleccionarlo."
-            self.ask_status = "BUTTONS_GETUSER"
+            text = "Insert the name of the fighter, or use the buttons prompted."
+            self.ask_status = "BUTTONS_GETFIGHTER"
 
         keyboard = self.build_keyboard(items)
         self.send_message(text, chat, keyboard)
-        log.send_message("Telegram - sent WarBotAdmin.handle_getuser")
+        log.send_message("Telegram - sent WarBotAdmin.handle_getfighter")
     
 
     def handle_getcandidates(self, chat):
@@ -654,34 +665,43 @@ class WarBotAdmin(TelegramInterface):
         Where * is any string
         """
 
-        text = '🕵️ *Lista de candidatos:*'
-        i = 1
+        text = '🕵️ *List of candidates:*'
+        i = 0
         for candidate in self.bot.get_candidates():
-            text += "\n" + str(i) + ". " + candidate
+            text += "\n" + str(i+1) + ". `" + candidate + "`"
             i += 1
-        self.send_message(text, chat)
-    
-    def handle_adduser(self, chat, attr):
-        """Handles command /adduser
+            if i%5 == 0:
+                self.send_message(text, chat)
+                text = ""
+        if text != "":
+            self.send_message(text, chat)
+                
+        log.send_message("[TELEGRAM] sent WarBotAdmin.handle_getcandidates")
 
-        Adds one or more users
+    
+    def handle_addfighter(self, chat, attr):
+        """Handles command /addfighter
+
+        Adds one or more fighters
 
         Command call
         ------------
         This function is called whenever the authorized user sends a message
         to the Telegram bot of the form:
 
-            /adduser*
+            /addfighter*
         
         Where * is any string. The use of this command is:
 
             Option 1.
-                /adduser [user1] [user2] ...
+                /addfighter [user1](!) [user2](!) ...
                 Will add the users passed as args
             Option 2.
-                /adduser
+                /addfighter
                 Will display button GUI with candidates (so candidates can be
-                switched to users)
+                switched to fighters)
+            
+            Note: passing a ! next to the username will announce the user
         """
 
         items = []
@@ -690,53 +710,58 @@ class WarBotAdmin(TelegramInterface):
 
         if len(attr) > 0:
             for username in attr:
-                result = self.bot.add_user(username)
+                announce = False
+                if "!" in username:
+                    announce = True
+
+                username = username.replace("!", "")
+
+                result = self.bot.add_fighter(username)
                 if result:
-                    text += "Se ha insertado el usuario *" + username + "*. "
-                    if self.bot.get_user_announce():
+                    text += "Fighter *" + username + "* has been added. "
+                    if self.bot.get_fighter_announce():
                         self.bot.add_announce_queue(username)
-                        text += "Será anunciado (activado por defecto, para desactivar use /stopannounceusers).\n"
+                        text += "Will be announced (by default, to deactivate use /stopannouncefighters).\n"
                     else:
-                        if len(attr) > 1:
-                            if attr[1] == "announce":
-                                self.bot.add_announce_queue(username)
-                                text += "Será anunciado.\n"
-                            else:
-                                text += "\n"
+                        if announce:
+                            self.bot.add_announce_queue(username)
+                            text += "Will be announced.\n"
+                        else:
+                            text += "\n"
                 else:
-                    text += "El usuario *"+username+"* ya se encontraba en la lista de usuarios.\n"
+                    text += "Fighter *"+username+"* is already on the fighters list.\n"
             
             self.ask_status = "NONE"
         else:
             items = self.bot.get_candidates()
-            text = "Inserta el nombre del usuario a añadir, o usa el desplegable para añadir desde candidatos."
-            self.ask_status = "BUTTONS_ADDUSER"
+            text = "Insert the name of the fighter to add, or use the buttons prompted."
+            self.ask_status = "BUTTONS_ADDFIGHTER"
 
         keyboard = self.build_keyboard(items)
         self.send_message(text, chat, keyboard)
-        log.send_message("[TELEGRAM] sent handle_adduser")
+        log.send_message("[TELEGRAM] sent handle_addfighter")
 
 
-    def handle_deleteuser(self, chat, attr):
+    def handle_deletefighter(self, chat, attr):
         """Handles command /deleteuser
 
-        Deletes one or more users
+        Deletes one or more fighters
 
         Command call
         ------------
         This function is called whenever the authorized user sends a message
         to the Telegram bot of the form:
 
-            /deleteuser*
+            /deletefighter*
         
         Where * is any string. The use of this command is:
 
             Option 1.
-                /deleteuser [user1] [user2] ...
-                Will delete the users passed as args
+                /deletefighter [user1] [user2] ...
+                Will delete the fighters passed as args
             Option 2.
-                /deleteuser
-                Will display button GUI with users
+                /deletefighter
+                Will display button GUI with fighters
         """
 
         items = []
@@ -745,21 +770,21 @@ class WarBotAdmin(TelegramInterface):
 
         if len(attr) > 0:
             for username in attr:
-                result = self.bot.delete_user(username)
+                result = self.bot.delete_fighter(username)
                 if result:
-                    text += "Se ha eliminado el usuario *" + username + "*.\n"
+                    text += "Fighter *" + username + "* has been deleted.\n"
                 else:
-                    text += "El usuario *" + username + "* no estaba en la lista de usuarios, y por tanto no puede eliminarse.\n"
+                    text += "Fighter *" + username + "* not found, therefore cannot be deleted.\n"
 
             self.ask_status = "NONE"
         else:
-            items = self.bot.get_users()
-            text = "Inserta el nombre del usuario que desea eliminar, o usa el desplegable."
-            self.ask_status = "BUTTONS_DELETEUSER"
+            items = self.bot.get_fighters()
+            text = "Insert the name of the fighter to delete, or use the buttons prompted."
+            self.ask_status = "BUTTONS_DELETEFIGHTER"
 
         keyboard = self.build_keyboard(items)
         self.send_message(text, chat, keyboard)
-        log.send_message("[TELEGRAM] sent WarBotAdmin.handle_deleteuser")
+        log.send_message("[TELEGRAM] sent WarBotAdmin.handle_deletefighter")
 
     
     def handle_addcandidate(self, chat, attr):
@@ -786,11 +811,11 @@ class WarBotAdmin(TelegramInterface):
             for username in attr:
                 result = self.bot.add_candidate(username)
                 if result:
-                    text += "Se ha insertado el candidato *" + username + "*.\n"
+                    text += "Candidate *" + username + "* has been added.\n"
                 else:
-                    text += "El candidato *" + username + "* ya se encontraba en la lista de candidatos.\n"
+                    text += "Candidate *" + username + "* is already on the candidates list.\n"
         else:
-            text = "No has insertado el candidato a añadir."
+            text = "You did not insert the candidate to add."
         
         self.send_message(text, chat)
         log.send_message("[TELEGRAM] sent WarBotAdmin.handle_addcandidate")
@@ -826,14 +851,14 @@ class WarBotAdmin(TelegramInterface):
             for username in attr:
                 result = self.bot.delete_candidate(username)
                 if result:
-                    text += "Se ha eliminado el candidato *" + username + "*.\n"
+                    text += "Candidate *" + username + "* has been deleted.\n"
                 else:
-                    text += "El candidato *" + username + "* no estaba en la lista de candidatos, y por tanto no puede eliminarse.\n"
+                    text += "Candidate *" + username + "* not found, therefore cannot be deleted.\n"
 
             self.ask_status = "NONE"
         else:
             items = self.bot.get_candidates()
-            text = "Inserta el nombre del candidato que desea eliminar, o usa el desplegable."
+            text = "Insert the name of the candidate to delete, or use the buttons prompted."
             self.ask_status = "BUTTONS_DELETECANDIDATE"
 
         keyboard = self.build_keyboard(items)
@@ -844,7 +869,7 @@ class WarBotAdmin(TelegramInterface):
     def handle_revive(self, chat, attr):
         """Handles command /revive
         
-        Revives one or more users
+        Revives one or more fighters
 
         Command call
         ------------
@@ -865,16 +890,16 @@ class WarBotAdmin(TelegramInterface):
 
         if len(attr) > 0:
             for username in attr:
-                result = self.bot.revive_user(username)
+                result = self.bot.revive_fighter(username)
                 if result:
-                    text = "Has revivido a *" + username + "*. 🧟\n"
+                    text = "Fighter *" + username + "* has been revived. 🧟\n"
                 else:
-                    text = "No hemos podido revivir a *" + username + "* porque no estaba en la lista de usuarios o ya estaba vivo.\n"
+                    text = "We could not revive *" + username + "*: not found or already alive.\n"
 
             self.ask_status = "NONE"
         else:
-            items = self.bot.get_dead_users()
-            text = "Inserta el nombre del usuario que desea revivir, o usa el desplegable."
+            items = self.bot.get_dead_fighters()
+            text = "Insert the name of the fighter to revive, or use the buttons prompted."
             self.ask_status = "BUTTONS_REVIVE"
 
         keyboard = self.build_keyboard(items)
@@ -882,54 +907,54 @@ class WarBotAdmin(TelegramInterface):
         log.send_message("[TELEGRAM] sent WarBotAdmin.handle_revive")
 
 
-    def handle_announceusers(self, chat):
-        """Handles command /announceusers
+    def handle_announcefighters(self, chat):
+        """Handles command /announcefighters
 
-        Activate announcing new users in Twitter automatically
+        Activate announcing new fighters in Twitter automatically
 
         Command call
         ------------
         This function is called whenever the authorized user sends a message
         to the Telegram bot of the form:
 
-            /announceusers*
+            /announcefighters*
         
         Where * is any string
         """
 
-        if self.bot.get_user_announce():
-            text = "Los usuarios ya se están anunciando por defecto. Para desactivarlo, use /stopannounceusers."
+        if self.bot.get_fighter_announce():
+            text = "Fighters are being announced by default. To deactivate, use /stopannouncefighters."
         else:
-            self.bot.set_user_announce(True)
-            text = "De ahora en adelante, los nuevos usuarios se anunciarán por defecto."
+            self.bot.set_fighter_announce(True)
+            text = "From now on, new fighters will be announced by default."
         
         self.send_message(text, chat)
-        log.send_message("[TELEGRAM] sent WarBotAdmin.handle_announceusers")
+        log.send_message("[TELEGRAM] sent WarBotAdmin.handle_announcefighters")
     
 
-    def handle_stopannounceusers(self, chat):
-        """Handles command /stopannounceusers
+    def handle_stopannouncefighters(self, chat):
+        """Handles command /stopannouncefighters
 
-        Stops announcing new users in Twitter automatically
+        Stops announcing new fighters in Twitter automatically
 
         Command call
         ------------
         This function is called whenever the authorized user sends a message
         to the Telegram bot of the form:
 
-            /stopannounceusers*
+            /stopannouncefighters*
         
         Where * is any string
         """
 
-        if not self.bot.get_user_announce():
-            text = "Los usuarios ya no se anunciaban por defecto. Use /announceusers para activarlo."
+        if not self.bot.get_fighter_announce():
+            text = "Fighters weren't being announced already. Use /announcefighters to activate."
         else:
-            self.bot.set_user_announce(False)
-            text = "No se anunciarán los nuevos usuarios."
+            self.bot.set_fighter_announce(False)
+            text = "New users won't be announced by default."
         
         self.send_message(text, chat)
-        log.send_message("[TELEGRAM] sent WarBotAdmin.handle_stopannounceusers")
+        log.send_message("[TELEGRAM] sent WarBotAdmin.handle_stopannouncefighters")
     
     def handle_status(self, chat):
         """Handles command /status
@@ -946,28 +971,33 @@ class WarBotAdmin(TelegramInterface):
         Where * is any string
         """
 
-        text = "- Opt-in: "
+        text = "- Number of fighters: "
+        text += str(len(self.bot.get_fighters()))
+        text += " ({} 💀)\n".format(str(len(self.bot.get_dead_fighters())))
+        text += "- Number of candidates: "
+        text += str(len(self.bot.get_candidates()))
+        text += "\n- Opt-in: "
         if self.bot.get_optin_running():
-            text += "activado\n"
+            text += "activated\n"
         else:
-            text += "desactivado\n"
-        text += "- Próxima batalla: "
+            text += "deactivated\n"
+        text += "- Next battle: "
         if self.bot.get_stop_next_battle():
-            text += "no habrá\n"
+            text += "won't be\n"
         else:
             date = self.bot.get_next_battle()
             text += "{}/{}/{} {:02d}:{:02d}\n".format(date.day, date.month, date.year, date.hour, date.minute)
-        text += "- Frecuencia de batalla: "
+        text += "- Battle frequency: "
         f_h, f_m = self.bot.get_battle_frequency()
-        text += "{} horas, {} minutos\n".format(f_h, f_m)
-        text += "- Frecuencia activada: "
+        text += "{} hours {} minutes\n".format(f_h, f_m)
+        text += "- Frequency active: "
         if self.bot.get_stop_frequency():
             text += "no\n"
         else:
-            text += "sí\n"
-        text += "- Anuncio de usuarios: "
-        if self.bot.get_user_announce():
-            text += "automático\n"
+            text += "yes\n"
+        text += "- Fighter announce: "
+        if self.bot.get_fighter_announce():
+            text += "automatic\n"
         else:
             text += "manual\n"
         
@@ -999,13 +1029,13 @@ class WarBotAdmin(TelegramInterface):
         if do_restart:
             result = self.bot.restart()
             if result:
-                text = "La base de datos ha sido reiniciada."
+                text = "Database has been restarted."
             else:
-                text = "La base de datos no pudo ser reiniciada."
+                text = "Database could not be restarted."
         else:
-            text = "Para poder realizar esta acción, debe confirmarla. Tenga " \
-                + "en cuenta que esta acción no podrá recuperarse. Para " \
-                + "confirmar, use /restart `confirm`."
+            text = "To do this, you must confirm this action. Have in " \
+                + "consideration this action is irreversible. TO confirm, " \
+                + "use /restart `confirm`."
 
         self.send_message(text, chat)
         log.send_message("[TELEGRAM] sent WarBotAdmin.handle_restart")

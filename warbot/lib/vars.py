@@ -1,3 +1,6 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
 """
 Variables
 =========
@@ -113,12 +116,25 @@ ROUTES = {
     'LOGS':         'logs',
 
     # Bot scripts
-    'BOTS':         'bots'
+    'BOTS':         'bots',
+
+    # Phrases for battles
+    'PHRASES':      'resources'
 }
 
 
-# Filename of database. Will be stored at ROUTES['DATABASE']/filename
+# Filenames
+#   Specifies the names of the files where stuff will be stored and loaded from
+#   They will be in one of folder route's folders
+FILENAMES = {
+    # Database
+    'DATABASE':     'warbot_db.json',
+
+    # Phrases
+    'PHRASES':      'phrases.txt'
+}
 DATABASE_FILENAME = 'warbot_db.json'
+
 
 
 import os

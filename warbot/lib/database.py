@@ -1,3 +1,6 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
 """
 WarBotDB
 ========
@@ -38,11 +41,11 @@ class WarBotDB:
     - candidates: Table to store candidates
         {'username': str}
         - username: username of candidate
-    - users: Table to store users
+    - fighters: Table to store fighters
         {'username': str, 'alive': bool, 'killed': list<str>, 'show': bool}
         - username: username of user
         - alive: is username alive
-        - killed: list of users that user has killed
+        - killed: list of fighters that fighter has killed
         - show: show in battle update list or not
     - vars: Table to store variables
         {'varname': str, 'value': _}
@@ -71,10 +74,10 @@ class WarBotDB:
                 If true, battle frequency is ignored
             - stop_next_battle : bool
                 If true, no next battle will be programmed
-            - user_announce : bool
-                If true, users will be announced automatically
+            - fighter_announce : bool
+                If true, fighters will be announced automatically
             - announce_queue : list<>
-                Queue for user announce
+                Queue for fighter announce
             - battle_queue : list<> #WIP
                 Queue for battle announce
             - message_queue : list<>
@@ -86,30 +89,30 @@ class WarBotDB:
         TinyDB main database
     db_candidates : TinyDB.table
         TinyDB database table for candidates
-    db_users : TinyDB.table
-        TinyDB database table for users
+    db_fighters : TinyDB.table
+        TinyDB database table for fighters
     db_vars : TinyDB.table
         TinyDB database table for variables
     
     Methods
     -------
-    From users and candidates tables
-        insert_user(username, alive=True)
-            Inserts user in database
+    From fighters and candidates tables
+        insert_fighter(username, alive=True)
+            Inserts fighter in database
         insert_candidate(username)
             Inserts candidate in database
-        insert_user_kill(username, killed)
+        insert_fighter_kill(username, killed)
             Insert kill in database: username killed killed
-        change_user_alive(username, alive)
+        change_fighter_alive(username, alive)
             Change username's life status to alive
-        change_user_show(username, show)
+        change_fighter_show(username, show)
             Change username's show status to show
-        delete_user(username)
-            Delete user from database
+        delete_fighter(username)
+            Delete fighter from database
         delete_candidate(username)
             Delete candidate from database
-        get_users() : list<str>
-            Gets all users
+        get_fighters() : list<str>
+            Gets all fighters
         get_candidates() : list<str>
             Gets all candidates
     
@@ -148,20 +151,20 @@ class WarBotDB:
         self.db_route = route.paste(database_route, database_filename)
         self.db = TinyDB(self.db_route)
         self.db_candidates = self.db.table('candidates', cache_size=0)
-        self.db_users = self.db.table('users', cache_size=0)
+        self.db_fighters = self.db.table('fighters', cache_size=0)
         self.db_vars = self.db.table('vars', cache_size=0)
         self.setup_vars()
 
 
-    def insert_user(self, username, alive=True):
-        # Check if user is already in the database
+    def insert_fighter(self, username, alive=True):
+        # Check if fighter is already in the database
         User = Query()
-        if len(self.db_users.search(User.username == username)) > 0:
-            log.send_message("[DATABASE] Insertion error: User " + username + " is already on the database")
+        if len(self.db_fighters.search(User.username == username)) > 0:
+            log.send_message("[DATABASE] Insertion error: fighter " + username + " is already on the database")
         else:
-            new_user = {'username': username, 'alive': alive, 'killed': [], 'show': True}
-            self.db_users.insert(new_user)
-            log.send_message("[DATABASE] Insertion: User " + username + " added to the database")
+            new_fighter = {'username': username, 'alive': alive, 'killed': [], 'show': True}
+            self.db_fighters.insert(new_fighter)
+            log.send_message("[DATABASE] Insertion: fighter " + username + " added to the database")
 
         # Delete from candidates
         self.delete_candidate(username)
@@ -178,9 +181,9 @@ class WarBotDB:
             log.send_message("[DATABASE] Insertion: Candidate " + username + " added to the database")
 
 
-    def insert_user_kill(self, username, killed):
+    def insert_fighter_kill(self, username, killed):
         User = Query()
-        new_killed = self.db_users.search(User.username == username)
+        new_killed = self.db_fighters.search(User.username == username)
         if len(new_killed) > 0:
             new_killed = new_killed[0]['killed']
         else:
@@ -188,31 +191,31 @@ class WarBotDB:
         if not killed in new_killed:
             new_killed.append(killed)
         
-        self.db_users.update({'killed': new_killed}, User.username == username)
+        self.db_fighters.update({'killed': new_killed}, User.username == username)
         log.send_message("[DATABASE] Update: " + username + " killed " + killed)
 
 
-    def change_user_alive(self, username, alive):
+    def change_fighter_alive(self, username, alive):
         User = Query()
-        self.db_users.update({'alive': alive}, User.username == username)
+        self.db_fighters.update({'alive': alive}, User.username == username)
         if alive:
             log.send_message("[DATABASE] Update: " + username + " is now alive")
         else:
             log.send_message("[DATABASE] Update: " + username + " is now dead")
 
 
-    def change_user_show(self, username, show):
+    def change_fighter_show(self, username, show):
         User = Query()
-        self.db_users.update({'show': show}, User.username == username)
+        self.db_fighters.update({'show': show}, User.username == username)
         if show:
             log.send_message("[DATABASE] Update: " + username + " is now showed")
         else:
             log.send_message("[DATABASE] Update: " + username + " is now hidden")
 
 
-    def delete_user(self, username):
-        self.db_users.remove(where('username') == username)
-        log.send_message("[DATABASE] Removed: user " + username)
+    def delete_fighter(self, username):
+        self.db_fighters.remove(where('username') == username)
+        log.send_message("[DATABASE] Removed: fighter " + username)
 
 
     def delete_candidate(self, username):
@@ -220,8 +223,8 @@ class WarBotDB:
         log.send_message("[DATABASE] Removed: candidate " + username)
 
 
-    def get_users(self):
-        return self.db_users.all()
+    def get_fighters(self):
+        return self.db_fighters.all()
 
 
     def get_candidates(self):
@@ -252,8 +255,8 @@ class WarBotDB:
             self.db_vars.insert({'varname': 'stop_frequency', 'value': True})
         if len(self.db_vars.search(Vars.varname == 'stop_next_battle')) == 0:
             self.db_vars.insert({'varname': 'stop_next_battle', 'value': True})
-        if len(self.db_vars.search(Vars.varname == 'user_announce')) == 0:
-            self.db_vars.insert({'varname': 'user_announce', 'value': False})
+        if len(self.db_vars.search(Vars.varname == 'fighter_announce')) == 0:
+            self.db_vars.insert({'varname': 'fighter_announce', 'value': False})
         if len(self.db_vars.search(Vars.varname == 'announce_queue')) == 0:
             self.db_vars.insert({'varname': 'announce_queue', 'value': []})
         if len(self.db_vars.search(Vars.varname == 'battle_queue')) == 0:
@@ -326,13 +329,13 @@ class WarBotDB:
         Vars = Query()
         return self.db_vars.search(Vars.varname == 'stop_next_battle')[0]['value']
 
-    def update_user_announce(self, set):
+    def update_fighter_announce(self, set):
         Vars = Query()
-        self.db_vars.update({'value': set}, Vars.varname == 'user_announce')
+        self.db_vars.update({'value': set}, Vars.varname == 'fighter_announce')
 
-    def get_user_announce(self):
+    def get_fighter_announce(self):
         Vars = Query()
-        return self.db_vars.search(Vars.varname == 'user_announce')[0]['value']
+        return self.db_vars.search(Vars.varname == 'fighter_announce')[0]['value']
 
     def add_announce_queue(self, username):
         list = self.get_announce_queue()
@@ -395,7 +398,7 @@ class WarBotDB:
         if could_wipe:
             self.db = TinyDB(self.db_route)
             self.db_candidates = self.db.table('candidates', cache_size=0)
-            self.db_users = self.db.table('users', cache_size=0)
+            self.db_fighters = self.db.table('fighters', cache_size=0)
             self.db_vars = self.db.table('vars', cache_size=0)
             self.setup_vars()
 

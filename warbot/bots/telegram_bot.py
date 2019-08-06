@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*- 
+# -*- coding: utf-8 -*-
 
 """
 telegram_bot
@@ -26,14 +26,16 @@ import os, sys
 sys.path.append(os.path.join(os.path.dirname(folder), "lib"))
 
 from admin import WarBotAdmin
-from vars import TELEGRAM_VARS, DATABASE_FILENAME, ROUTES
+from vars import TELEGRAM_VARS, ROUTES, FILENAMES
 
 
 a = WarBotAdmin(
     telegram_token      = TELEGRAM_VARS['TELEGRAM_TOKEN'],
     telegram_sleep_time = TELEGRAM_VARS['SLEEP_TIME'],
     database_route      = ROUTES['DATABASE'],
-    database_filename   = DATABASE_FILENAME,
+    database_filename   = FILENAMES['DATABASE'],
+    phrases_route       = ROUTES['PHRASES'],
+    phrases_filename    = FILENAMES['PHRASES'],
     auth_id             = TELEGRAM_VARS['AUTH_ID']
 )
 

@@ -26,7 +26,7 @@ import os, sys
 sys.path.append(os.path.join(os.path.dirname(folder), "lib"))
 
 from twitter import WarBotTwitter
-from vars import TWITTER_VARS, DATABASE_FILENAME, ROUTES
+from vars import TWITTER_VARS, ROUTES, FILENAMES
 
 
 t = WarBotTwitter(
@@ -36,7 +36,9 @@ t = WarBotTwitter(
     access_token_secret = TWITTER_VARS['ACCESS_TOKEN_SECRET'],
     twitter_sleep_time  = TWITTER_VARS['SLEEP_TIME'],
     database_route      = ROUTES['DATABASE'],
-    database_filename   = DATABASE_FILENAME,
+    database_filename   = FILENAMES['DATABASE'],
+    phrases_route       = ROUTES['PHRASES'],
+    phrases_filename    = FILENAMES['PHRASES'],
     ih_images_route     = ROUTES['IMAGES'],
     ih_resources_route  = ROUTES['RESOURCES'],
     ih_store_route      = ROUTES['IMAGES']

@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*- 
+# -*- coding: utf-8 -*-
 
 """
 WarBotTwitter
@@ -57,6 +57,7 @@ class WarBotTwitter:
     def __init__(self, consumer_key, consumer_secret, \
         access_token, access_token_secret, twitter_sleep_time, \
         database_route, database_filename, \
+        phrases_route, phrases_filename, \
         ih_images_route, ih_resources_route, ih_store_route):
         """
         Parameters
@@ -76,6 +77,10 @@ class WarBotTwitter:
         database_filename : str
             Filename of JSON database for WarBotDB.
                 To avoid bugs, must be absolute path
+        phrases_route : str
+            Folder route to phrases file
+        phrases_filename : str
+            Filename of txt file containing battle phrases
         ih_images_route : str
             Folder route to images for WarBotImageHandler.
                 To avoid bugs, must be absolute path
@@ -90,7 +95,8 @@ class WarBotTwitter:
         self.api = WarBotAPI(consumer_key, consumer_secret, \
             access_token, access_token_secret, \
             database_route, database_filename, ih_images_route)
-        self.bot = WarBot(database_route, database_filename)
+        self.bot = WarBot(database_route, database_filename, \
+            phrases_route, phrases_filename)
         self.sleep_time = twitter_sleep_time
         self.sleep_time_optin = twitter_sleep_time * 4
         self.imgh = WarBotImageHandler(ih_images_route, ih_resources_route, \
@@ -143,11 +149,11 @@ class WarBotTwitter:
         Parameters
         ----------
         winner : str
-            Winner user's username
+            Winner fighter's username
         defeated : str
-            Defeated user's username
+            Defeated fighter's username
         alivelist : list<str>
-            Alive user's list
+            Alive fighters' list
         """
 
         # generate filenames
@@ -159,71 +165,76 @@ class WarBotTwitter:
         out_route = self.imgh.generate_battle(img1, img2, out)
 
         # generate text
-        left = len(self.bot.get_alive_users())
+        left = len(self.bot.get_alive_fighters())
         if left == 1:
-            left_text = "¡@{} ha ganado la guerra! 🏆".format(winner)
+            left_text = "¡@{} has won the war! 🏆".format(winner)
         else:
-            left_text = "Quedan {} usuarios".format(left)
+            left_text = "{} fighters left".format(left)
         if left == 2:
-            left_text += ". ¿Quién ganará la guerra? 🤔 ¡Hagan sus apuestas!"
+            left_text += ". Who will win the war? 🤔 Do your bets!"
         images = [out_route]
 
         # if wants to display list
         if alivelist and left > 1:
-            out2 = "aliveusers_" + str(random.randint(1000, 9999)) + ".png"
-            out2_route = self.imgh.generate_alive(self.bot.get_users_extended(), out2)
+            out2 = "alivefighters_" + str(random.randint(1000, 9999)) + ".png"
+            out2_route = self.imgh.generate_alive(self.bot.get_fighters_extended(), out2)
             images.append(out2_route)
         if left == 1:
-            out2 = "winneruser_" + str(random.randint(1000, 9999)) + ".png"
+            out2 = "winnerfighter_" + str(random.randint(1000, 9999)) + ".png"
             out2_route = self.imgh.generate_winner(img1, out2)
             images.append(out2_route)
         
         # post tweet
         try:
-            self.api.post_tweet("@{} ha matado a @{}. ".format(winner, defeated) \
-                + left_text, images)
+            self.api.post_tweet(self.bot.generate_battle_text(winner, defeated) \
+                + " " + left_text, images)
             log.send_message("[TWITTER] Tweet posted: " + winner + \
                 " killed " + defeated)
-            self.bot.add_message_queue("🛎️ Publicado tweet: " \
-                + "*{}* ha matado a *{}*.".format(winner, defeated))
+            self.bot.add_message_queue("🛎️ Tweet posted: " \
+                + "*{}* has killed *{}*.".format(winner, defeated))
         except Exception as e:
             log.send_message("[TWITTER] Tweet COULD NOT be posted: " + \
                 winner + " killed " + defeated + " -> " + str(e))
-            self.bot.add_message_queue("⚠️ Tweet no pudo ser publicado: " \
-                + "*{}* ha matado a *{}*.".format(winner, defeated))
+            self.bot.add_message_queue("⚠️ Tweet could not be posted: " \
+                + "*{}* has killed *{}*.".format(winner, defeated))
 
         # remove images generated
         os.remove(img1_route)
         os.remove(img2_route)
         os.remove(out_route)
+
+        # generate list of 100 left, and save it
+        if len(self.bot.get_alive_fighters()) == 100:
+            self.imgh.generate_alive(self.bot.get_alive_fighters(), "alive_last100.png")
+
         if alivelist:
            os.remove(out2_route)
             
 
-    def send_newuser(self, username):
-        """Send new user message to Twitter
+    def send_newfighter(self, username):
+        """Send new fighter message to Twitter
 
-        Sends new user message, including image
+        Sends new fighter message, including image
         """
 
         # generate filenames
         img = username + "_profilepic.png"
         img_route = self.api.download_profilepic(username, img)
-        out = "newuser-"+username+".png"
-        out_route = self.imgh.generate_newuser(img, out)
+        out = "newfighter-"+username+".png"
+        out_route = self.imgh.generate_newfighter(img, out)
 
         # post tweet
         try:
-            self.api.post_tweet("¡Nueva incorporación! " + \
-                "@{}, ¡bienvenidx a la batalla!".format(username), [out_route])
-            log.send_message("[TWITTER] Tweet posted: new user " + username)
-            self.bot.add_message_queue("🛎️ Publicado tweet: nuevo usuario " \
+            self.api.post_tweet("We have a new fighter! " + \
+                "@{}, welcome to the battle!".format(username), [out_route])
+            log.send_message("[TWITTER] Tweet posted: new fighter " + username)
+            self.bot.add_message_queue("🛎️ Tweet posted: new fighter " \
                 + "*{}*".format(username))
         except Exception as e:
-            log.send_message("[TWITTER] Tweet COULD NOT be posted: new user " \
+            log.send_message("[TWITTER] Tweet COULD NOT be posted: new fighter " \
                 + username + " -> " + str(e))
-            self.bot.add_message_queue("⚠️ Tweet no pudo ser publicado: nuevo " \
-                + "usuario *{}*".format(username))
+            self.bot.add_message_queue("⚠️ Tweet could not be posted: new " \
+                + "fighter *{}*".format(username))
 
         # remove images generated
         os.remove(img_route)
@@ -244,12 +255,12 @@ class WarBotTwitter:
             battle_queue = self.bot.get_battle_queue()
             self.bot.wipe_battle_queue()
 
-            for user in ann_queue:
-                if self.bot.get_user_announce():
-                    self.send_newuser(user)
+            for fighter in ann_queue:
+                if self.bot.get_fighter_announce():
+                    self.send_newfighter(fighter)
             
             for battle in battle_queue:
-                show_list = len(self.bot.get_alive_users()) \
+                show_list = len(self.bot.get_alive_fighters()) \
                     < self.bot.show_threshold
                 self.send_battle(battle['winner'], battle['defeated'], \
                     show_list)
@@ -265,13 +276,13 @@ class WarBotTwitter:
                     log.send_message("[TWITTER] Ran scheduled battle")
                     w, d = self.bot.battle()
                     if w == None or d == None:
-                        self.bot.add_message_queue("⚠️ No se pudo producir la " \
-                        + "batalla programada. Parando programaciones.")
+                        self.bot.add_message_queue("⚠️ Scheduled battle could " \
+                        + "not be executed. Stopping programmed battles.")
                         self.bot.set_stop_frequency(True)
                     else:
-                        self.bot.add_message_queue("🛎️ Se ha producido una " \
-                            + "batalla programada: *{}* ".format(w) \
-                            + "ha matado a *{}*.".format(d))
+                        self.bot.add_message_queue("🛎️ A programmed battle " \
+                            + "has been executed: *{}* ".format(w) \
+                            + "has killed *{}*.".format(d))
                     self.bot.set_stop_next_battle(True)
 
                     # if the frequency is set, we set next schedule

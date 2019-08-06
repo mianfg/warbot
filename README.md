@@ -37,6 +37,9 @@ The admin can control the following features:
 
 | Name | Description |
 | --- | --- |
+| [**bots**](./bots) | Contains two scripts, one for each bot |
+| ├── [telegram_bot.py](./bots/telegram_bot.py) | Telegram bot |
+| └── [twitter_bot.py](./bots/twitter_bot.py) | Twitter bot |
 | [**database**](./database) | Contains database files |
 | └── [warbot_db.json](./database/warbot_db.json) | TinyDB JSON database. _This can be modified in `vars.py`._ |
 | [**lib**](./lib) | Contains app's classes and modules |
@@ -46,17 +49,11 @@ The admin can control the following features:
 | ├── [imagehandler.py](./lib/imagehandler.py) | `WarBotImageHandler` |
 | ├── [telegram.py](./lib/telegram.py) | `TelegramInterface` |
 | ├── [twitter.py](./lib/twitter.py) | `WarBotTwitter` |
+| ├── [vars.py](./lib/vars.py) | Contains _environment_ variables |
 | └── [warbot.py](./lib/warbot.py) | `WarBot` |
+| [**logs**](./logs) | We recommend storing the logs here |
 | [**resources**](./resources) | Contains resources for image generating, also this app's logo |
-| ├── [font_sansserif.ttf](./resources/font_sansserif.ttf) | Sans-serif font for image generating |
-| ├── [ih_aliveuserspic.png](./resources/ih_aliveuserspic.png) | Background template for alive user's picture |
-| ├── [ih_battlepic.png](./resources/ih_battlepic.png) | Background template for battle's picture |
-| ├── [ih_newuserpic.png](./resources/ih_newuserpic.png) | Background template for new user's picture |
-| └── [logo.png](./resources/logo.png) | This project's logo! ;) |
-| [bot.py](./bot.py) | Runs both bots' scripts |
-| [telegram_bot.py](./telegram_bot.py) | Runs Telegram's bot script |
-| [twitter_bot.py](./twitter_bot.py) | Runs Twitter's bot script |
-| [vars.py](./vars.py) | Contains environment variables |
+| [**tmp**](./tmp) | Folder where the images generated will be stored temporarily |
 
 ## Class structure
 
@@ -72,11 +69,13 @@ The admin can control the following features:
 
 ## How to set up the bot
 
-The bot can be set up by executing the scripts `telegram_bot.py` and `twitter_bot.py` simultaneously. This functionality has been shortcut, and you can simply execute the `bot.py` folder using:
+The bot can be set up by executing the scripts `telegram_bot.py` and `twitter_bot.py` simultaneously. This functionality has been shortcut, and you can simply execute the `warbot` module:
 
 ```
-python bot.py
+python -m warbot
 ```
+
+> To execute it, this way, you must be located on this repo's main folder, having the folder `warbot` listed by `ls` (to clarify).
 
 Please refer to [requirements](#requirements) for more information on the libraries and versions that have been tested.
 
@@ -85,8 +84,37 @@ Please refer to [requirements](#requirements) for more information on the librar
 The `vars.py` file contains an amount of variables that control the bot. You can generate them by **making a Twitter app** and **starting a Telegram bot**.
 
 * **Make a Twitter app.** You will need a Twitter Developers account. More information can be found on the [Twitter Developers](https://dev.twitter.com/) website.
+
     > **NOTE:** the only permissions needed are read and write, no direct message functionality is yet used in this bot.
 * **Start a Telegram bot.** This can be easily done using Telegram's **Bot Father**. Start a conversation with `@botfather` on Telegram and simply go along!
+
+### Some things for Bot Father
+
+Telegram bots incorporate the useful functionality of shortcutting the commands by integrating them in the Telegram app's GUI. To do this, you have to talk to Bot Father using the command `/setcommands`, selecting your bot and then sending it the following message:
+
+>help - Show help
+>runoptin - Enable opt-in
+>stopoptin - Disable opt-in
+>nextbattle - Next battle info
+>schedulebattle - Schedule next battle
+>battlefrequency - Battle frequency
+>setbattlefrequency - Set frequency
+>stopfrequency - Ignore frequency
+>forcebattle - Force battle
+>getfighters - Get all fighters
+>getfighter - Info about a fighter
+>getcandidates - Get all candidates
+>addfighter - Add fighter
+>deletefighter - Delete fighter
+>addcandidate - Add candidate
+>deletecandidate - Delete candidate
+>revive - Revive fighter
+>announcefighters - Automatically announce fighters
+>stopannouncefighters - Do not automatically announce fighters
+>status - Bot status
+>restart - Restart database
+
+Of course, the information is scarce, but do not hesitate to use the `/help` command for more detailed info.
 
 ## Requirements
 

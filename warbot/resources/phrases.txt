@@ -1,0 +1,12 @@
+# Battle phrases
+# --------------
+#
+# These are the battle phrases that will be used when announcing battles in Twitter. Each phrase must be placed on a
+# single line. Empty lines and lines starting with # will be ignored.
+#
+# Placeholders:
+#   - {{WINNER}} - will display winner user's username
+#   - {{DEFEATED}} - will display defeated user's username
+
+
+@{{WINNER}} has killed @{{DEFEATED}}.
