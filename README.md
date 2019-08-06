@@ -37,35 +37,35 @@ The admin can control the following features:
 
 | Name | Description |
 | --- | --- |
-| [**bots**](./bots) | Contains two scripts, one for each bot |
-| ├── [telegram_bot.py](./bots/telegram_bot.py) | Telegram bot |
-| └── [twitter_bot.py](./bots/twitter_bot.py) | Twitter bot |
-| [**database**](./database) | Contains database files |
-| └── [warbot_db.json](./database/warbot_db.json) | TinyDB JSON database. _This can be modified in `vars.py`._ |
-| [**lib**](./lib) | Contains app's classes and modules |
-| ├── [admin.py](./lib/admin.py) | `WarBotAdmin` |
-| ├── [api.py](./lib/api.py) | `WarBotAPI` |
-| ├── [database.py](./lib/database.py) | `WarBotDB` |
-| ├── [imagehandler.py](./lib/imagehandler.py) | `WarBotImageHandler` |
-| ├── [telegram.py](./lib/telegram.py) | `TelegramInterface` |
-| ├── [twitter.py](./lib/twitter.py) | `WarBotTwitter` |
-| ├── [vars.py](./lib/vars.py) | Contains _environment_ variables |
-| └── [warbot.py](./lib/warbot.py) | `WarBot` |
-| [**logs**](./logs) | We recommend storing the logs here |
-| [**resources**](./resources) | Contains resources for image generating, also this app's logo |
-| [**tmp**](./tmp) | Folder where the images generated will be stored temporarily |
+| [**bots**](./warbot/bots) | Contains two scripts, one for each bot |
+| ├── [telegram_bot.py](./warbot/bots/telegram_bot.py) | Telegram bot |
+| └── [twitter_bot.py](./warbot/bots/twitter_bot.py) | Twitter bot |
+| [**database**](./warbot/database) | Contains database files |
+| └── [warbot_db.json](./warbot/database/warbot_db.json) | TinyDB JSON database. _This can be modified in `vars.py`._ |
+| [**lib**](./warbot/lib) | Contains app's classes and modules |
+| ├── [admin.py](./warbot/lib/admin.py) | `WarBotAdmin` |
+| ├── [api.py](./warbot/lib/api.py) | `WarBotAPI` |
+| ├── [database.py](./warbot/lib/database.py) | `WarBotDB` |
+| ├── [imagehandler.py](./warbot/lib/imagehandler.py) | `WarBotImageHandler` |
+| ├── [telegram.py](./warbot/lib/telegram.py) | `TelegramInterface` |
+| ├── [twitter.py](./warbot/lib/twitter.py) | `WarBotTwitter` |
+| ├── [vars.py](./warbot/lib/vars.py) | Contains _environment_ variables |
+| └── [warbot.py](./warbot/lib/warbot.py) | `WarBot` |
+| [**logs**](./warbot/logs) | We recommend storing the logs here |
+| [**resources**](./warbot/resources) | Contains resources for image generating, also this app's logo |
+| [**tmp**](./warbot/tmp) | Folder where the images generated will be stored temporarily |
 
 ## Class structure
 
 | Name | Description | File |
 | --- | --- | --- |
-| `TelegramInterface` | This module interacts directly with the Telegram API | [lib/telegram.py](./lib/telegram.py) |
-| `WarBot` | Main controller for Bloomgogo War Bot | [lib/warbot.py](./lib/warbot.py) |
-| `WarBotAdmin` | This module interacts with the Telegram bot | [lib/admin.py](./lib/admin.py) |
-| `WarBotAPI` | This module interacts with the Twitter API | [lib/api.py](./lib/api.py) |
-| `WarBotImageHandler` | This module generates images | [lib/imagehandler.py](./lib/imagehandler.py) |
-| `WarBotDB` | This module controls the database, in TinyDB | [lib/database.py](./lib/database.py) |
-| `WarBotTwitter` | This module interacts with `WarBotAPI` to deliver messages to Twitter | [lib/twitter.py](./lib/twitter.py) |
+| `TelegramInterface` | This module interacts directly with the Telegram API | [lib/telegram.py](./warbot/lib/telegram.py) |
+| `WarBot` | Main controller for Bloomgogo War Bot | [lib/warbot.py](./warbot/lib/warbot.py) |
+| `WarBotAdmin` | This module interacts with the Telegram bot | [lib/admin.py](./warbot/lib/admin.py) |
+| `WarBotAPI` | This module interacts with the Twitter API | [lib/api.py](./warbot/lib/api.py) |
+| `WarBotImageHandler` | This module generates images | [lib/imagehandler.py](./warbot/lib/imagehandler.py) |
+| `WarBotDB` | This module controls the database, in TinyDB | [lib/database.py](./warbot/lib/database.py) |
+| `WarBotTwitter` | This module interacts with `WarBotAPI` to deliver messages to Twitter | [lib/twitter.py](./warbot/lib/twitter.py) |
 
 ## How to set up the bot
 
