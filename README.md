@@ -93,25 +93,45 @@ The `vars.py` file contains an amount of variables that control the bot. You can
 Telegram bots incorporate the useful functionality of shortcutting the commands by integrating them in the Telegram app's GUI. To do this, you have to talk to Bot Father using the command `/setcommands`, selecting your bot and then sending it the following message:
 
 >help - Show help
+
 >runoptin - Enable opt-in
+
 >stopoptin - Disable opt-in
+
 >nextbattle - Next battle info
+
 >schedulebattle - Schedule next battle
+
 >battlefrequency - Battle frequency
+
 >setbattlefrequency - Set frequency
+
 >stopfrequency - Ignore frequency
+
 >forcebattle - Force battle
+
 >getfighters - Get all fighters
+
 >getfighter - Info about a fighter
+
 >getcandidates - Get all candidates
+
 >addfighter - Add fighter
+
 >deletefighter - Delete fighter
+
 >addcandidate - Add candidate
+
 >deletecandidate - Delete candidate
+
 >revive - Revive fighter
+
 >announcefighters - Automatically announce fighters
+
 >stopannouncefighters - Do not automatically announce fighters
+
 >status - Bot status
+
 >restart - Restart database
 
 Of course, the information is scarce, but do not hesitate to use the `/help` command for more detailed info.
