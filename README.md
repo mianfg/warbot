@@ -4,7 +4,13 @@
 
 <h1 align="center"><p align="center">Bloomgogo War Bot</h1></h1>
 
-> Created by **Miguel Ángel Fernández Gutiérrez** · https://mianfg.bloomgogo.com/
+> Created by **Miguel Ángel Fernández Gutiérrez**
+
+## Some history...
+
+This is the first somewhat complex programming project I ever developed. I created it as a fun game to play in my hometown, and it was a huge hit! You can, in fact, see the result in this [Twitter account (in Spanish)](https://twitter.com/UbriqueWarBot). The code from this bot may be outdated, but I leave it here as a testament to how much I have learned in just a few years.
+
+_Bloomogogo_ is the name of the first "project hub" I ever developed - it was the place where I poured all my creativity. Some of the projects you might see in my repository were intended to be in the _Bloomgogo_ "collection of projects". Some years after I came up with the idea, I decided to include them all in my [personal website](https://mianfg.me/projects).
 
 ## Introduction
 
@@ -28,10 +34,6 @@ The admin can control the following features:
 * **Opt-in:** Twitter users can automatically enter to the candidates list if the opt-in option is enabled, by simply mentioning the bot's Twitter username in a tweet.
 * **New user announce:** new users can be announced to the Twitter's bot account, either natively or for certain users.
 * **Battle updates:** the app has a system to post tweets with images and lists to Twitter, to mantain the bot's user base updated about the war.
-
-## Documentation
-
-> Right now, a documentation site is being built on [Bloomgogo](https://bloomgogo.com/). For now, you can consult the documentation in the individual Python folders. Every method, class and variable is thoroughly documented.
 
 ## File structure
 
